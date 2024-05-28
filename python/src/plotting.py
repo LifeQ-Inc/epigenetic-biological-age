@@ -1,5 +1,67 @@
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
+import matplotlib.patches as mpatches
+
+def plot_clustermap(corrs, p_values_corrected, plot_row_colors, plot_column_colors, q, p, row_colors=None, row_features=None, column_colors=None, col_features=None, name=None):
+    # Convert correlations to numeric
+    correlations = corrs.apply(pd.to_numeric)
+
+    if plot_row_colors:
+        row_colors_series = pd.Series(row_features).map(row_colors)
+    else:
+        row_colors_series = None
+
+    if plot_column_colors:
+
+        col_colors_series = correlations.columns.map(column_colors)
+    else:
+        col_colors_series = None
+
+    # Create a mask for significant correlations
+    mask = p_values_corrected < 0.05
+
+    # Create a DataFrame for the annotations
+    annotations = correlations.astype(str).applymap(lambda x: f"{float(x):.2f}")
+    if q:
+        annotations[mask] = annotations[mask] + '*'
+    elif p:
+        annotations[mask] = annotations[mask] + '#'
+
+    g = sns.clustermap(correlations,
+                    cmap='coolwarm', 
+                    figsize=(10, 8), 
+                    col_colors=col_colors_series, 
+                    row_colors=row_colors_series,
+                    annot= annotations,
+                    fmt='s')
+
+    if plot_row_colors:
+        legend_patches = [mpatches.Patch(color=color, label=label) for label, color in row_colors.items()]
+        g.cax.legend(handles=legend_patches, loc='upper right', bbox_to_anchor=(5, 1))
+
+    plt.savefig(f"plots/{name}_clustermap.png", dpi = 300)
+
+def plot_feature_distributions(feats, features_dict, feature_colors):
+    num_cols = feats.shape[1]
+    num_rows = num_cols // 2 if num_cols % 2 == 0 else num_cols // 2 + 1
+    fig, axs = plt.subplots(num_rows, 2, figsize=(10, num_rows*5))
+    axs = axs.flatten()
+
+    for i, col in enumerate(feats.columns):
+        # calculate the minimum, median, and maximum
+        min_val = feats[col].min()
+        median_val = feats[col].median()
+        max_val = feats[col].max()
+        # plot the histogram
+        sns.histplot(feats[col], kde=True, ax=axs[i], color = feature_colors[features_dict[col]])
+        # plot the minimum, median, and maximum
+        for val in [min_val, median_val, max_val]:
+            axs[i].axvline(val, color = 'black', linestyle = 'dashed', linewidth = 1.5, alpha = 0.7)
+        # plot minimum, median, and maximum in the legend
+        axs[i].legend([f'min: {min_val:.2f}', f'median: {median_val:.2f}', f'max: {max_val:.2f}'])
+    plt.tight_layout()
+    plt.savefig('plots/feature_distributions.png')
 
 def plot_target_distribution(target_train, target_test):
     """

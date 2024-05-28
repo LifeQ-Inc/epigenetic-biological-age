@@ -36,6 +36,16 @@ def main():
         features['sleep PCA1'] = pca_df['PCA1']
         features['sleep PCA2'] = pca_df['PCA2']
 
+    behavioural, physiological, combined = get_feature_categories(features)
+    feats_corr, feats_p, feats_q = correlation_df(behavioural, physiological)
+    age_corr, age_p, age_q = correlation_df(combined, age_df)
+
+    # table 1 generation
+    features_dict, feature_colors = get_features_and_colors()
+    plot_feature_distributions(combined, features_dict, feature_colors)
+    plot_clustermap(feats_corr, feats_q, plot_row_colors=False, plot_column_colors=False, q=True, p=False, row_colors=None, row_features=None, column_colors=None, col_features=None, name='wearable_data')
+    plot_clustermap(age_corr, age_q, plot_row_colors=False, plot_column_colors=False, q=True, p=False, row_colors=None, row_features=None, column_colors=None, col_features=None, name='wearable_data_vs_epigenetic_ages')
+
     if args.train:
        
         features_train, features_test, target_train, target_test = prepare_data(features, age_df, test_set_size=0.2, random_seed=0, stratification=True)

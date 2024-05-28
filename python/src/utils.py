@@ -2,6 +2,8 @@ import logging
 import os
 import pandas as pd
 import numpy as np
+from statsmodels.stats import multitest
+import scipy.stats as stats
 from sklearn.model_selection import train_test_split
 
 def read_data():
@@ -23,6 +25,7 @@ def read_data():
     elif os.path.exists('data/epigenetic_ages.csv'):
         logging.info('No epigenetic age data, reading from separate file')
         age_df = pd.read_csv('data/epigenetic_ages.csv')
+        age_df.drop('sex', axis=1, inplace=True)
         age_df.set_index('Sample_Name', inplace=True)
     else:
         logging.info('No epigenetic age data, please process epigenetic ages first')    
@@ -37,6 +40,59 @@ def read_data():
                 'totalSleepTime_all_cv', 'total_rem_cv','percentage_rem_cv', 'total_deep_cv', 'percentage_deep_cv', 'total_light_cv', 'percentage_light_cv', 'waso_duration_cv', 'sleep_efficiency_cv','SQS_cv']]
 
     return df, features, age_df, sleep_features
+
+def correlation_df(df1, df2):
+    # Initialize empty DataFrames for correlations and p-values
+    correlations = pd.DataFrame(index=df1.columns, columns=df2.columns)
+    p_values = pd.DataFrame(index=df1.columns, columns=df2.columns)
+
+    # Compute each correlation and p-value
+    for col in df1.columns:
+        for var in df2.columns:
+            corr, p = stats.pearsonr(df1[col], df2[var])
+            correlations.loc[col, var] = round(corr, 2)
+            p_values.loc[col, var] = p
+
+    # Correct the p-values using FDR method
+    p_values_corrected = p_values.copy()
+    for column in p_values.columns:
+        _, p_values_corrected[column], _, _ = multitest.multipletests(p_values[column], method='fdr_bh')
+
+    return correlations, p_values ,p_values_corrected
+
+def get_features_and_colors():
+    # Dictionary of feature types
+    features_dict = {
+        'VO2max': 'physiological',
+        'normalized crest time': 'physiological',
+        'SEVR': 'physiological',
+        'SAR': 'physiological',
+        'LASI': 'physiological',
+        'BPI': 'physiological',
+        'ED': 'physiological',
+        'RHR': 'physiological',
+        'weekly light active hours': 'behavioural',
+        'weekly moderate active hours': 'behavioural',
+        'weekly vigorous active hours': 'behavioural',
+        'daily sedentary hours': 'behavioural',
+        'sleep PCA1': 'circadian',
+        'sleep PCA2': 'circadian',
+        'wear_active': 'behavioural'
+    }
+
+    # Define a color dictionary for the feature types
+    feature_colors = {
+        'behavioural': 'magenta',
+        'physiological': 'salmon',
+        'circadian': 'turquoise'
+    }
+    return features_dict, feature_colors
+
+def get_feature_categories(df):
+    behavioural = df[['weekly light active hours', 'weekly moderate active hours', 'weekly vigorous active hours', 'daily sedentary hours', 'sleep PCA1', 'sleep PCA2']]
+    physiological = df[['VO2max', 'normalized crest time', 'SEVR', 'SAR', 'LASI', 'BPI', 'ED', 'RHR']]
+    combined = df[['VO2max', 'normalized crest time', 'SEVR', 'SAR', 'LASI', 'BPI', 'ED', 'RHR', 'weekly light active hours', 'weekly moderate active hours', 'weekly vigorous active hours', 'daily sedentary hours', 'sleep PCA1', 'sleep PCA2']]
+    return behavioural, physiological, combined
 
 def prepare_data(features, targets,  test_set_size, random_seed,stratification = True):
     """
