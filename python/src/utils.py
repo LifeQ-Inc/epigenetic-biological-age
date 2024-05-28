@@ -164,3 +164,23 @@ def extract_model_info(model_info):
     target = model_info['target']
 
     return model, input_features, scale, target
+
+def get_me_df(features):
+    me_df = pd.read_csv('data/MEs.csv')
+    me_df.set_index('Sample_Name', inplace=True)
+    me_df = me_df.loc[features.index]
+
+    return me_df
+
+def get_module_colors():
+    return {
+    'MEturquoise': 'turquoise',
+    'MEblue': 'blue',
+    'MEred': 'red',
+    'MEbrown': 'brown',
+    'MEgreen': 'green',
+    'MEblack': 'black',
+    'MEyellow': 'yellow',
+    'MEgrey': 'grey',
+    'MEBrownBlueNet': 'brown'
+}

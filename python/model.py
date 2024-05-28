@@ -95,6 +95,12 @@ def main():
     plot_shap_violin_plot(importance, model_input_features, features_scaled, features, model)
     individual_feature_contribution_plot(features_scaled, model_input_features, feature_importance, age_df, target, participant = 7)
 
+    # plot for MEs
+    me_df = get_me_df(features)
+    module_colors = get_module_colors()
+    me_corr, me_p, me_q = correlation_df(age_df[[target, f'predicted_{target}']], me_df)
+    plot_clustermap(me_corr, me_q, plot_row_colors=False, plot_column_colors=True, q=True, p=False, row_colors=None, row_features=None, column_colors=module_colors, col_features=None, name='MEs_vs_predicted_ages')
+
     age_df.to_csv('data/predictions.csv')
 
 if __name__ == '__main__':

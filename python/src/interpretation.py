@@ -82,7 +82,7 @@ def plot_shap_violin_plot(importance, selected_features, features_scaled, featur
     shap_values = extract_feature_importance(model, features = features_scaled, features_test=None, features_train=None, full_dataset=True)
     plt.figure(figsize=(10,10))
     shap.summary_plot(shap_values, features[selected_features], plot_type="violin")
-    plt.savefig('plots/shap_summary.png')
+    plt.savefig('plots/shap_summary.svg')
 
 
 def individual_feature_contribution_plot(features_scaled, selected_features, feature_importance, target_values, target, participant):
@@ -129,4 +129,4 @@ def individual_feature_contribution_plot(features_scaled, selected_features, fea
     ax.spines['right'].set_visible(False)
     ax.spines['left'].set_visible(False)
 
-    plt.savefig('plots/individual_feature_contribution.png')
+    plt.savefig('plots/individual_feature_contribution.svg')

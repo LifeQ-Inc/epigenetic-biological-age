@@ -40,7 +40,7 @@ def plot_clustermap(corrs, p_values_corrected, plot_row_colors, plot_column_colo
         legend_patches = [mpatches.Patch(color=color, label=label) for label, color in row_colors.items()]
         g.cax.legend(handles=legend_patches, loc='upper right', bbox_to_anchor=(5, 1))
 
-    plt.savefig(f"plots/{name}_clustermap.png", dpi = 300)
+    plt.savefig(f"plots/{name}_clustermap.svg", dpi = 300)
 
 def plot_feature_distributions(feats, features_dict, feature_colors):
     num_cols = feats.shape[1]
@@ -61,7 +61,7 @@ def plot_feature_distributions(feats, features_dict, feature_colors):
         # plot minimum, median, and maximum in the legend
         axs[i].legend([f'min: {min_val:.2f}', f'median: {median_val:.2f}', f'max: {max_val:.2f}'])
     plt.tight_layout()
-    plt.savefig('plots/feature_distributions.png')
+    plt.savefig('plots/feature_distributions.svg')
 
 def plot_target_distribution(target_train, target_test):
     """
@@ -122,7 +122,7 @@ def plot_target_distribution(target_train, target_test):
     axes[1, 1].legend()
 
     plt.tight_layout()
-    plt.savefig('plots/model_distributions.png')
+    plt.savefig('plots/model_distributions.svg')
 
 def plot_model_predictions_scatter_and_distribution(target_values, target):
     """
@@ -167,4 +167,4 @@ def plot_model_predictions_scatter_and_distribution(target_values, target):
     axs[1].set_title('')
     axs[1].set_xlabel(f'Distribution of predicted and actual {target}')
 
-    plt.savefig('plots/model_predictions_scatter_and_distribution.png')
+    plt.savefig('plots/model_predictions_scatter_and_distribution.svg')
