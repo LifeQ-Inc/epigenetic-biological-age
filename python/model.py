@@ -28,9 +28,9 @@ def main():
         logging.error('Process epigenetic data first')
         raise Exception("Process epigenetic data first")
 
-    if 'sleep_PCA1' in df.columns:
-        features['sleep PCA1'] = df['sleep_PCA1']
-        features['sleep PCA2'] = df['sleep_PCA2']
+    if 'sleep PCA1' in df.columns:
+        features['sleep PCA1'] = df['sleep PCA1']
+        features['sleep PCA2'] = df['sleep PCA2']
     else:
         pca_df, loadings_df, important_features_pca1, important_features_pca2 = run_pca_process(sleep_features, 2, drop=True)
         features['sleep PCA1'] = pca_df['PCA1']
