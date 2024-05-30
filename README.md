@@ -7,6 +7,7 @@ Model development for predicting and interpreting epigenetic biological age acce
 This project requires Python 3.8 or later.
 
 First, git clone the repository [git://github.com/epigenetic-biological-age]. Then, navigate to the project directory: `cd epigenetic-biological-age`.
+Ensure that the pip version you are runnning is >= 20.0.2. 
 We recommend using a virtual environment. Activate the virtual environment and install the project dependencies: `pip install -r requirements.txt`
 
 ## Usage
