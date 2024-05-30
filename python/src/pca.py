@@ -200,7 +200,7 @@ def run_pca_process(features, n, drop):
     important_features_pca1 = loadings_df[(loadings_df['PCA1'] > importance_threshold) | (loadings_df['PCA1'] < -importance_threshold)]
     important_features_pca2 = loadings_df[(loadings_df['PCA2'] > importance_threshold) | (loadings_df['PCA2'] < -importance_threshold)]
 
-    logging.info(important_features_pca1)
-    logging.info(important_features_pca2)
+    logging.info(f"Important features for PCA1:\n {important_features_pca1}")
+    logging.info(f"Important features for PCA2:\n {important_features_pca2}")
 
     return pca_df
