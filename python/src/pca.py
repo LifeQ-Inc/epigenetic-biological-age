@@ -203,4 +203,4 @@ def run_pca_process(features, n, drop):
     logging.info(important_features_pca1)
     logging.info(important_features_pca2)
 
-    return pca_df, loadings_df, important_features_pca1, important_features_pca2
+    return pca_df

@@ -32,7 +32,7 @@ def main():
         features['sleep PCA1'] = df['sleep PCA1']
         features['sleep PCA2'] = df['sleep PCA2']
     else:
-        pca_df, loadings_df, important_features_pca1, important_features_pca2 = run_pca_process(sleep_features, 2, drop=True)
+        pca_df = run_pca_process(sleep_features, 2, drop=True)
         features['sleep PCA1'] = pca_df['PCA1']
         features['sleep PCA2'] = pca_df['PCA2']
 
