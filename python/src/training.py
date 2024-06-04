@@ -318,7 +318,7 @@ def train(linear_models, features_train, features_test, target_train, target_tes
         phys  = ['VO2max', 'normalized crest time','SEVR', 'SAR','LASI', 'BPI', 'ED', 'RHR']
         circadian_pca = ['sleep PCA1', 'sleep PCA2']
 
-        if target == 'PCPhenoAgeResid':
+        if target == 'PCPhenoAge acceleration':
             selected_features_dict = {
                 # "all": X_train.columns.tolist(),
                 "physiological": phys,

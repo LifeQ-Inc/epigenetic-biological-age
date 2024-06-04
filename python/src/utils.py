@@ -21,7 +21,7 @@ def read_data():
     df.set_index('Sample_Name', inplace=True)
 
     if 'PCPhenoAge' in df.columns:
-        age_df = df[['ChronAge','PCHorvath1', 'PCHorvath2', 'PCHannum', 'PCPhenoAge', 'PCGrimAge','ChronAge','PCHorvath1Resid', 'PCHorvath2Resid', 'PCHannumResid','PCPhenoAgeResid', 'PCGrimAgeResid']]
+        age_df = df[['ChronAge','PCHorvath1', 'PCHorvath2', 'PCHannum', 'PCPhenoAge', 'PCGrimAge','ChronAge','PCHorvath1 acceleration', 'PCHorvath2 acceleration', 'PCHannum acceleration','PCPhenoAge acceleration', 'PCGrimAge acceleration']]
     elif os.path.exists('data/epigenetic_ages.csv'):
         logging.info('No epigenetic age data, reading from separate file')
         age_df = pd.read_csv('data/epigenetic_ages.csv')
@@ -122,9 +122,9 @@ def prepare_data(features, targets,  test_set_size, random_seed,stratification =
     if stratification:
         bins = [-np.inf, -4, 0, 4, np.inf]
         labels = [0, 1, 2, 3]
-        targets['PCPhenoAgeResid_bins'] = pd.cut(targets['PCPhenoAgeResid'], bins=bins, labels=labels)
+        targets['PCPhenoAge acceleration_bins'] = pd.cut(targets['PCPhenoAge acceleration'], bins=bins, labels=labels)
 
-        targets['stratify_key'] = targets['PCPhenoAgeResid_bins'].astype(str) + '-' + np.where(targets['ChronAge'] > median_chron_age, 'A', 'B')
+        targets['stratify_key'] = targets['PCPhenoAge acceleration_bins'].astype(str) + '-' + np.where(targets['ChronAge'] > median_chron_age, 'A', 'B')
     
     if stratification:
         features_train, features_test, target_train, target_test = train_test_split(features, targets, test_size= test_set_size, random_state= random_seed, stratify=targets['stratify_key'])

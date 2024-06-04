@@ -98,7 +98,7 @@ def scree_plot(pca):
     plt.title('Scree Plot')
     plt.hlines(0.15, 0, len(explained_variance)+1, colors='r', linestyles='dashed')
     plt.tight_layout()
-    plt.savefig('plots/pca_scree_plot.png')
+    plt.savefig('plots/pca_scree_plot.svg')
 
 def eigenvector_plot(pca, processed_features):
     """
@@ -127,7 +127,7 @@ def eigenvector_plot(pca, processed_features):
     plt.axhline(y=0.2, color='r', linestyle='--')
     plt.legend()
     plt.tight_layout()
-    plt.savefig('plots/pca_eigenvector.png')
+    plt.savefig('plots/pca_eigenvector.svg')
 
 def calc_loadings(pca, processed_features):
     """
@@ -179,7 +179,7 @@ def plot_loadings(loadings_df):
     plt.axhline(y=0.75, color='r', linestyle='--')
     plt.legend()
     plt.tight_layout()
-    plt.savefig('plots/pca_loadings.png')
+    plt.savefig('plots/pca_loadings.svg')
 
 def run_pca_process(features, n, drop):
     if drop:

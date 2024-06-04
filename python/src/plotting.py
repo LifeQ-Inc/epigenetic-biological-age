@@ -4,24 +4,17 @@ import seaborn as sns
 import matplotlib.patches as mpatches
 
 def plot_clustermap(corrs, p_values_corrected, plot_row_colors, plot_column_colors, q, p, row_colors=None, row_features=None, column_colors=None, col_features=None, name=None):
-    # Convert correlations to numeric
     correlations = corrs.apply(pd.to_numeric)
-
     if plot_row_colors:
         row_colors_series = pd.Series(row_features).map(row_colors)
     else:
         row_colors_series = None
-
     if plot_column_colors:
-
         col_colors_series = correlations.columns.map(column_colors)
     else:
         col_colors_series = None
 
-    # Create a mask for significant correlations
     mask = p_values_corrected < 0.05
-
-    # Create a DataFrame for the annotations
     annotations = correlations.astype(str).applymap(lambda x: f"{float(x):.2f}")
     if q:
         annotations[mask] = annotations[mask] + '*'
@@ -30,15 +23,16 @@ def plot_clustermap(corrs, p_values_corrected, plot_row_colors, plot_column_colo
 
     g = sns.clustermap(correlations,
                     cmap='coolwarm', 
-                    figsize=(10, 8), 
+                    figsize=(10, 10), 
                     col_colors=col_colors_series, 
                     row_colors=row_colors_series,
                     annot= annotations,
-                    fmt='s')
-
+                    fmt='s',
+                    cbar_kws={"shrink": 0.5, "location":"left"})
+    
     if plot_row_colors:
         legend_patches = [mpatches.Patch(color=color, label=label) for label, color in row_colors.items()]
-        g.cax.legend(handles=legend_patches, loc='upper right', bbox_to_anchor=(5, 1))
+        g.cax.legend(handles=legend_patches, loc='upper right', bbox_to_anchor=(0, 1))
 
     plt.savefig(f"plots/{name}_clustermap.svg", dpi = 300)
 
@@ -60,10 +54,10 @@ def plot_feature_distributions(feats, features_dict, feature_colors):
             axs[i].axvline(val, color = 'black', linestyle = 'dashed', linewidth = 1.5, alpha = 0.7)
         # plot minimum, median, and maximum in the legend
         axs[i].legend([f'min: {min_val:.2f}', f'median: {median_val:.2f}', f'max: {max_val:.2f}'])
-    plt.tight_layout()
+    # plt.tight_layout()
     plt.savefig('plots/feature_distributions.svg')
 
-def plot_target_distribution(target_train, target_test):
+def plot_target_distribution(target_train, target_test, target):
     """
     Plots the distribution of target variables 'ChronAge' and 'PCPhenoAgeResid' for both training and testing datasets.
 
@@ -99,26 +93,26 @@ def plot_target_distribution(target_train, target_test):
     axes[0, 1].set_title('ChronAge - Testing')
     axes[0, 1].legend()
 
-    median_train_pc = round(target_train['PCPhenoAgeResid'].median(), 2)
-    q25_train_pc = round(target_train['PCPhenoAgeResid'].quantile(0.25), 2)
-    q75_train_pc = round(target_train['PCPhenoAgeResid'].quantile(0.75), 2)
+    median_train_pc = round(target_train[target].median(), 2)
+    q25_train_pc = round(target_train[target].quantile(0.25), 2)
+    q75_train_pc = round(target_train[target].quantile(0.75), 2)
 
-    sns.histplot(target_train['PCPhenoAgeResid'], kde=True, color='blue', label='Training', ax=axes[1, 0])
+    sns.histplot(target_train[target], kde=True, color='blue', label='Training', ax=axes[1, 0])
     axes[1, 0].axvline(median_train_pc, color='r', linestyle='--', label=f'Median: {median_train_pc}')
     axes[1, 0].axvline(q25_train_pc, color='r', linestyle=':', label=f'Q1: {q25_train_pc}')
     axes[1, 0].axvline(q75_train_pc, color='r', linestyle=':', label=f'Q3: {q75_train_pc}')
-    axes[1, 0].set_title('PCPhenoAgeResid - Training')
+    axes[1, 0].set_title(f'{target} - Training')
     axes[1, 0].legend()
 
-    median_test_pc = round(target_test['PCPhenoAgeResid'].median(), 2)
-    q25_test_pc = round(target_test['PCPhenoAgeResid'].quantile(0.25), 2)
-    q75_test_pc = round(target_test['PCPhenoAgeResid'].quantile(0.75), 2)
+    median_test_pc = round(target_test[target].median(), 2)
+    q25_test_pc = round(target_test[target].quantile(0.25), 2)
+    q75_test_pc = round(target_test[target].quantile(0.75), 2)
 
-    sns.histplot(target_test['PCPhenoAgeResid'], kde=True, color='green', label='Testing', ax=axes[1, 1])
+    sns.histplot(target_test[target], kde=True, color='green', label='Testing', ax=axes[1, 1])
     axes[1, 1].axvline(median_test_pc, color='r', linestyle='--', label=f'Median: {median_test_pc}')
     axes[1, 1].axvline(q25_test_pc, color='r', linestyle=':', label=f'Q1: {q25_test_pc}')
     axes[1, 1].axvline(q75_test_pc, color='r', linestyle=':', label=f'Q3: {q75_test_pc}')
-    axes[1, 1].set_title('PCPhenoAgeResid - Testing')
+    axes[1, 1].set_title(f'{target} - Testing')
     axes[1, 1].legend()
 
     plt.tight_layout()
@@ -137,7 +131,7 @@ def plot_model_predictions_scatter_and_distribution(target_values, target):
     train_data = target_values[target_values['Dataset'] == 'Train']
     test_data = target_values[target_values['Dataset'] == 'Test']
 
-    fig, axs = plt.subplots(2, 1, figsize=(6, 12))
+    plt.figure(figsize=(6, 6))
 
     sns.regplot(x=train_data[target],
                 y=train_data[f'predicted_{target}'], 
@@ -145,8 +139,7 @@ def plot_model_predictions_scatter_and_distribution(target_values, target):
                 label='Train',
                 scatter_kws={'s': 15},
                 ci= None,
-                line_kws = {'linestyle': "--"},
-                ax=axs[0])
+                line_kws = {'linestyle': "--"})
 
     sns.regplot(x=test_data[target],
                 y=test_data[f'predicted_{target}'], 
@@ -154,17 +147,17 @@ def plot_model_predictions_scatter_and_distribution(target_values, target):
                 label='Test',
                 scatter_kws={'s': 15},
                 ci = None,
-                line_kws={'linestyle': '--'},
-                ax=axs[0])
+                line_kws={'linestyle': '--'})
 
-    axs[0].set_xlabel(f'Actual {target}')
-    axs[0].set_ylabel('Predicted {target}')
-    axs[0].legend()
+    plt.xlabel(f'Actual {target}')
+    plt.ylabel(f'Predicted {target}')
+    plt.legend()
+    plt.savefig('plots/model_predictions_scatter.svg')
 
-    sns.histplot(target_values[target], alpha = 0.5, kde=True, label='Actual', color='blue', ax=axs[1])
-    sns.histplot(target_values[f'predicted_{target}'], alpha = 0.5, kde= True,  label='Predicted', color='r', ax=axs[1])
-    axs[1].legend(loc='upper left')
-    axs[1].set_title('')
-    axs[1].set_xlabel(f'Distribution of predicted and actual {target}')
-
-    plt.savefig('plots/model_predictions_scatter_and_distribution.svg')
+    plt.figure(figsize=(6, 6))
+    sns.histplot(target_values[target], alpha = 0.5, kde=True, label='Actual', color='blue')
+    sns.histplot(target_values[f'predicted_{target}'], alpha = 0.5, kde= True,  label='Predicted', color='r')
+    plt.legend(loc='upper left')
+    plt.title('')
+    plt.xlabel(f'Distribution of predicted and actual {target}')
+    plt.savefig('plots/model_prediction_distribution.svg')

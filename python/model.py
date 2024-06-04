@@ -35,6 +35,7 @@ def main():
         pca_df = run_pca_process(sleep_features, 2, drop=True)
         features['sleep PCA1'] = pca_df['PCA1']
         features['sleep PCA2'] = pca_df['PCA2']
+        features.to_csv('data/wearable_data.csv')
 
     behavioural, physiological, combined = get_feature_categories(features)
     feats_corr, feats_p, feats_q = correlation_df(behavioural, physiological)
@@ -47,15 +48,14 @@ def main():
     plot_clustermap(age_corr, age_q, plot_row_colors=False, plot_column_colors=False, q=True, p=False, row_colors=None, row_features=None, column_colors=None, col_features=None, name='wearable_data_vs_epigenetic_ages')
 
     if args.train:
-       
+        targets = ['PCPhenoAge acceleration', 'PCPhenoAge']
         features_train, features_test, target_train, target_test = prepare_data(features, age_df, test_set_size=0.2, random_seed=0, stratification=True)
-        plot_target_distribution(target_train, target_test)
+        plot_target_distribution(target_train, target_test, targets[0])
 
         linear_models = get_linear_models()
-        targets = ['PCPhenoAgeResid', 'PCPhenoAge']
         results = train(linear_models, features_train, features_test, target_train, target_test, targets)
 
-        pheno_accel_results = results['PCPhenoAgeResid'][results['PCPhenoAgeResid']['feature_selection'] == 'physiological']
+        pheno_accel_results = results['PCPhenoAge acceleration'][results['PCPhenoAge acceleration']['feature_selection'] == 'physiological']
         pheno_results = results['PCPhenoAge']
         pheno_accel_results.to_csv('data/PCPhenoAgeAccel_model_performance.csv')
         pheno_results.to_csv('data/PCPhenoAge_model_performance.csv')
@@ -83,8 +83,9 @@ def main():
         plot_model_predictions_scatter_and_distribution(age_df, target)
 
     else:
-        model_info = pickle.load(open('models/PCPhenoAgeResid_model.pkl', 'rb'))
+        model_info = pickle.load(open('models/PCPhenoAge acceleration_model.pkl', 'rb'))
         model, model_input_features, scale, target = extract_model_info(model_info)
+        logging.info(model_info)
 
         features_scaled = scale.transform(features[model_input_features])
         age_df[f'predicted_{target}'] = model.predict(features_scaled)
