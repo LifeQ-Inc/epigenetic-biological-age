@@ -1,0 +1,21 @@
+# System files
+.DS_Store
+
+# Python files
+*.pyc
+*.pyo
+*.pyd
+__pycache__
+
+# Virtual environment
+venv/
+.env
+
+# IDE/Editor folders
+.vscode/
+.idea/
+
+# Build and distribution directories
+build/
+dist/
+*.egg-info/
