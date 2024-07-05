@@ -1,0 +1,28 @@
+Package: EpigeneticBiologicalAgeAnalysis
+Type: Package
+Version: 0.1.0
+Date: 2023-06-01
+Title: This package runs analysis on epigenetic methylation data and wearable device data to predict biological age
+Authors@R: person("Cameron", "Sugden", email = "cam3sugden@gmail.com", role = c("aut", "cre"))
+Description: This package runs analysis on epigenetic methylation data and wearable device data to predict biological age. It identifies differentially methylated positions (dmp) utilizing previously published
+    packages such as ChAMP and limma. It performs this analysis on epigenetic age acceleration, also a previously developed package, as well as on wearable device data which is used to predict biological age.
+    It then investigates age acceleration biology and how much of it can be picked up by the wearable. This is achieved by utilizing a previously developed package called weighted gene co-expression network analysis (WGCNA).
+    WGCNA produces modules, represented by a module eigenegene for each sample. The CpG sites in each module, as well as from the wearable feature dmp regressions are then annotated for genes and input into gene enrichment using enrichR package.
+    Significant KEGG 2021 pathways are extracted to understand the biology of each module of age acceleration and how much of it can be captured by the wearable.  
+License: What license it is under
+Depends:
+    R (>= 3.5.0)
+Imports:
+    dplyr,
+    WGCNA,
+    ChAMP,
+    limma,
+    enrichR,
+    IlluminaHumanMethylation450kanno.ilmn12.hg19,
+    tidyverse,
+    glmnet
+Suggests:
+    testthat
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.1
